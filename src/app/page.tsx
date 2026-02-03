@@ -147,9 +147,11 @@ export default function Home() {
   const [noButtonPosition, setNoButtonPosition] = useState({ x: 0, y: 0 });
   const [noClickCount, setNoClickCount] = useState(0);
   const [yesButtonScale, setYesButtonScale] = useState(1);
+  const [noButtonScale, setNoButtonScale] = useState(1);
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const noButtonRef = useRef<HTMLDivElement>(null);
 
   const noMessages = [
     "No 😢",
@@ -252,19 +254,35 @@ export default function Home() {
   };
 
   const moveNoButton = () => {
-    if (!containerRef.current) return;
+    // Button approximate size (accounting for scale)
+    const buttonWidth = 150 * noButtonScale;
+    const buttonHeight = 60 * noButtonScale;
+    
+    // Get viewport dimensions
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    
+    // Safe padding from all edges
+    const padding = 40;
+    
+    // Calculate absolute safe bounds (top-left corner of button)
+    const minLeft = padding;
+    const maxLeft = vw - buttonWidth - padding;
+    const minTop = padding;
+    const maxTop = vh - buttonHeight - padding;
+    
+    // Ensure we have valid ranges
+    const safeMaxLeft = Math.max(minLeft, maxLeft);
+    const safeMaxTop = Math.max(minTop, maxTop);
+    
+    // Generate random position within safe bounds
+    const newLeft = minLeft + Math.random() * (safeMaxLeft - minLeft);
+    const newTop = minTop + Math.random() * (safeMaxTop - minTop);
 
-    const container = containerRef.current.getBoundingClientRect();
-    const maxX = container.width - 150;
-    const maxY = container.height - 60;
-
-    setNoButtonPosition({
-      x: Math.random() * maxX - maxX / 2,
-      y: Math.random() * maxY - maxY / 2,
-    });
-
+    setNoButtonPosition({ x: newLeft, y: newTop });
     setNoClickCount((prev) => prev + 1);
     setYesButtonScale((prev) => Math.min(prev + 0.15, 2.5));
+    setNoButtonScale((prev) => Math.max(prev - 0.08, 0.5));
   };
 
   const handleYes = () => {
@@ -455,23 +473,48 @@ export default function Home() {
                   </Button>
                 </motion.div>
 
+                {noButtonPosition.x === 0 && noButtonPosition.y === 0 ? (
+                  <motion.div
+                    ref={noButtonRef}
+                    animate={{ scale: noButtonScale }}
+                    transition={{ type: "spring", bounce: 0.5 }}
+                  >
+                    <Button
+                      onMouseEnter={moveNoButton}
+                      onClick={moveNoButton}
+                      onTouchStart={moveNoButton}
+                      variant="outline"
+                      className="bg-white/80 hover:bg-white text-gray-700 text-base sm:text-xl px-4 sm:px-8 py-3 sm:py-6 rounded-full border-2 border-gray-300 whitespace-nowrap"
+                    >
+                      {noMessages[Math.min(noClickCount, noMessages.length - 1)]}
+                    </Button>
+                  </motion.div>
+                ) : null}
+              </div>
+
+              {/* No button - fixed position after first interaction */}
+              {noButtonPosition.x !== 0 || noButtonPosition.y !== 0 ? (
                 <motion.div
+                  ref={noButtonRef}
+                  className="fixed z-50"
                   animate={{
-                    x: noButtonPosition.x,
-                    y: noButtonPosition.y,
+                    left: noButtonPosition.x,
+                    top: noButtonPosition.y,
+                    scale: noButtonScale,
                   }}
-                  transition={{ type: "spring", bounce: 0.7 }}
+                  transition={{ type: "spring", bounce: 0.5, duration: 0.5 }}
                 >
                   <Button
                     onMouseEnter={moveNoButton}
                     onClick={moveNoButton}
+                    onTouchStart={moveNoButton}
                     variant="outline"
-                    className="bg-white/80 hover:bg-white text-gray-700 text-xl px-8 py-6 rounded-full border-2 border-gray-300"
+                    className="bg-white/80 hover:bg-white text-gray-700 text-base sm:text-xl px-4 sm:px-8 py-3 sm:py-6 rounded-full border-2 border-gray-300 whitespace-nowrap shadow-lg"
                   >
                     {noMessages[Math.min(noClickCount, noMessages.length - 1)]}
                   </Button>
                 </motion.div>
-              </div>
+              ) : null}
 
               {noClickCount > 3 && (
                 <motion.p
