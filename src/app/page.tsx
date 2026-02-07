@@ -213,7 +213,7 @@ export default function Home() {
     "I'll be sad forever 😢",
   ];
 
-  const gracePhotoSrc = "/grace.jpg";
+  const gracePhotoSrc = "/grace.JPG";
 
   const fireConfetti = useCallback(() => {
     const duration = 5000;
