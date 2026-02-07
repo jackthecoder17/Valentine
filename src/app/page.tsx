@@ -1,19 +1,26 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import confetti from "canvas-confetti";
 import { Button } from "@/components/ui/button";
 
+// Helper to generate deterministic-looking random values from index
+const seededRandom = (seed: number) => {
+  const x = Math.sin(seed * 9999) * 10000;
+  return x - Math.floor(x);
+};
+
 // Floating hearts component
 const FloatingHearts = () => {
-  const hearts = Array.from({ length: 25 }, (_, i) => ({
+  const [hearts] = useState(() => Array.from({ length: 25 }, (_, i) => ({
     id: i,
-    x: Math.random() * 100,
-    delay: Math.random() * 5,
-    duration: 8 + Math.random() * 10,
-    size: 15 + Math.random() * 25,
-  }));
+    x: seededRandom(i * 1) * 100,
+    delay: seededRandom(i * 2) * 5,
+    duration: 8 + seededRandom(i * 3) * 10,
+    size: 15 + seededRandom(i * 4) * 25,
+  })));
 
   return (
     <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
@@ -47,13 +54,13 @@ const FloatingHearts = () => {
 
 // Sparkle component
 const Sparkles = () => {
-  const sparkles = Array.from({ length: 50 }, (_, i) => ({
+  const [sparkles] = useState(() => Array.from({ length: 50 }, (_, i) => ({
     id: i,
-    x: Math.random() * 100,
-    y: Math.random() * 100,
-    delay: Math.random() * 3,
-    size: 4 + Math.random() * 8,
-  }));
+    x: seededRandom(i * 5) * 100,
+    y: seededRandom(i * 6) * 100,
+    delay: seededRandom(i * 7) * 3,
+    size: 4 + seededRandom(i * 8) * 8,
+  })));
 
   return (
     <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
@@ -85,12 +92,12 @@ const Sparkles = () => {
 
 // Rose petals falling
 const RosePetals = () => {
-  const petals = Array.from({ length: 15 }, (_, i) => ({
+  const [petals] = useState(() => Array.from({ length: 15 }, (_, i) => ({
     id: i,
-    x: Math.random() * 100,
-    delay: Math.random() * 8,
-    duration: 12 + Math.random() * 8,
-  }));
+    x: seededRandom(i * 9) * 100,
+    delay: seededRandom(i * 10) * 8,
+    duration: 12 + seededRandom(i * 11) * 8,
+  })));
 
   return (
     <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
@@ -141,6 +148,46 @@ const PulsingHeartBg = () => {
   );
 };
 
+// Celebration elements for YES stage
+const CelebrationElements = () => {
+  const [elements] = useState(() => Array.from({ length: 20 }, (_, i) => ({
+    id: i,
+    left: seededRandom(i * 12) * 100,
+    top: seededRandom(i * 13) * 100,
+    emoji: ["💖", "💗", "💓", "💕", "💞", "❤️", "🌹", "✨"][i % 8],
+  })));
+
+  return (
+    <motion.div
+      className="absolute inset-0 pointer-events-none"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+    >
+      {elements.map((el) => (
+        <motion.div
+          key={el.id}
+          className="absolute text-4xl"
+          style={{
+            left: `${el.left}%`,
+            top: `${el.top}%`,
+          }}
+          animate={{
+            scale: [0, 1, 0],
+            rotate: [0, 360],
+          }}
+          transition={{
+            duration: 3,
+            delay: el.id * 0.2,
+            repeat: Infinity,
+          }}
+        >
+          {el.emoji}
+        </motion.div>
+      ))}
+    </motion.div>
+  );
+};
+
 // Main Valentine component
 export default function Home() {
   const [stage, setStage] = useState<"intro" | "question" | "chase" | "yes">("intro");
@@ -165,6 +212,8 @@ export default function Home() {
     "PLEASE!!! 🙏",
     "I'll be sad forever 😢",
   ];
+
+  const gracePhotoSrc = "/grace.jpg";
 
   const fireConfetti = useCallback(() => {
     const duration = 5000;
@@ -356,7 +405,7 @@ export default function Home() {
                   ease: "linear",
                 }}
               >
-                Hey You! ✨
+                Hey Grace! ✨
               </motion.h1>
 
               <motion.p
@@ -365,8 +414,26 @@ export default function Home() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 }}
               >
-                I have something very special to ask you...
+                I have something very special to ask you, Grace...
               </motion.p>
+
+              <motion.div
+                className="mx-auto mb-8 w-40 h-40 md:w-48 md:h-48 rounded-full p-1 bg-gradient-to-tr from-pink-400 via-rose-400 to-red-400 shadow-2xl"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.6, type: "spring" }}
+              >
+                <div className="w-full h-full rounded-full overflow-hidden bg-white/80">
+                  <Image
+                    src={gracePhotoSrc}
+                    alt="Grace"
+                    width={220}
+                    height={220}
+                    className="w-full h-full object-cover"
+                    priority
+                  />
+                </div>
+              </motion.div>
 
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
@@ -449,7 +516,7 @@ export default function Home() {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.6, type: "spring", bounce: 0.5 }}
               >
-                Be My Valentine? 💘
+                Be My Valentine, Grace? 💘
               </motion.h2>
 
               {/* Buttons container */}
@@ -552,6 +619,23 @@ export default function Home() {
                 🥰
               </motion.div>
 
+              <motion.div
+                className="mx-auto mb-6 w-44 h-44 md:w-52 md:h-52 rounded-3xl p-1 bg-gradient-to-br from-pink-300 via-rose-300 to-red-300 shadow-2xl"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+              >
+                <div className="w-full h-full rounded-3xl overflow-hidden bg-white/80">
+                  <Image
+                    src={gracePhotoSrc}
+                    alt="Grace"
+                    width={260}
+                    height={260}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              </motion.div>
+
               <motion.h1
                 className="text-5xl md:text-8xl font-extrabold mb-6"
                 animate={{
@@ -569,7 +653,7 @@ export default function Home() {
                 className="space-y-4"
               >
                 <p className="text-3xl md:text-4xl text-gray-800 font-bold">
-                  I knew you&apos;d say yes! 💕
+                  I knew you&apos;d say yes, Grace! 💕
                 </p>
                 <p className="text-xl md:text-2xl text-gray-600">
                   You just made me the happiest person ever! 🌹
@@ -603,33 +687,7 @@ export default function Home() {
               </motion.div>
 
               {/* Extra celebration elements */}
-              <motion.div
-                className="absolute inset-0 pointer-events-none"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-              >
-                {Array.from({ length: 20 }).map((_, i) => (
-                  <motion.div
-                    key={i}
-                    className="absolute text-4xl"
-                    style={{
-                      left: `${Math.random() * 100}%`,
-                      top: `${Math.random() * 100}%`,
-                    }}
-                    animate={{
-                      scale: [0, 1, 0],
-                      rotate: [0, 360],
-                    }}
-                    transition={{
-                      duration: 3,
-                      delay: i * 0.2,
-                      repeat: Infinity,
-                    }}
-                  >
-                    {["💖", "💗", "💓", "💕", "💞", "❤️", "🌹", "✨"][i % 8]}
-                  </motion.div>
-                ))}
-              </motion.div>
+              <CelebrationElements />
             </motion.div>
           )}
         </AnimatePresence>
