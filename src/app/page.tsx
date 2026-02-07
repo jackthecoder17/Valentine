@@ -348,7 +348,7 @@ export default function Home() {
       className="min-h-screen bg-gradient-to-br from-pink-100 via-rose-100 to-red-100 overflow-hidden relative"
     >
       {/* Background audio */}
-      <audio ref={audioRef} src="/song.mp3" loop />
+      <audio ref={audioRef} src="/sam.mp3" loop />
 
       {/* Audio toggle button */}
       <motion.button
@@ -357,7 +357,7 @@ export default function Home() {
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
       >
-        {isPlaying ? "🔊" : "🔇"}
+        {isPlaying ? "🎶" : "🎵"}
       </motion.button>
 
       {/* Background animations */}
@@ -405,7 +405,7 @@ export default function Home() {
                   ease: "linear",
                 }}
               >
-                Hey Grace! ✨
+                Hey, baby girl! 🌹
               </motion.h1>
 
               <motion.p
@@ -414,7 +414,7 @@ export default function Home() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 }}
               >
-                I have something very special to ask you, Grace...
+                I've been meaning to ask you this for a while
               </motion.p>
 
               <motion.div
@@ -643,7 +643,7 @@ export default function Home() {
                 }}
                 transition={{ duration: 2, repeat: Infinity }}
               >
-                YAY!!!
+              LETS GOOOOO
               </motion.h1>
 
               <motion.div
@@ -656,7 +656,7 @@ export default function Home() {
                   I knew you&apos;d say yes, Grace! 💕
                 </p>
                 <p className="text-xl md:text-2xl text-gray-600">
-                  You just made me the happiest person ever! 🌹
+                  i love you very much 🌹
                 </p>
 
                 <motion.div
